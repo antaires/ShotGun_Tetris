@@ -8,16 +8,15 @@ Board::~Board(){}
 
 void Board::Update(float deltaTime)
 {
-  // TODO: use deltaTime
   // update position of active bricks based on velocity
   for(auto b : bricks)
   {
     b->Update(deltaTime);
   }
 
-  // destroy offscreen bullets
+  // TODO: destroy offscreen bullets
 
-  // destroy deactivet bricks
+  // TODO: destroy deactivated bricks
 }
 
 void Board::AddBullet(int x, int y)
@@ -35,8 +34,7 @@ void Board::SpawnBrick(float x)
 
 bool Board::CheckCollision(int x, int y)
 {
-  // loop over active brick loc and check for collision
-
+  // TODO: loop over active brick loc and check for collision
   return false;
 }
 
