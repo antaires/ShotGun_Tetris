@@ -38,12 +38,18 @@ void Game::Update()
   if (!graphics->ProcessInput(x, y)){isRunning = false;}
 
   // check collisions
+  board->CheckCollision(x, y); // if collision, mark to explode brick!
+
+  // generate bricks TODO: make randomly generated at top of screen
+  float brickY = (float) width / 2;
 
   // update board
-  // board->Update();
+  board->SpawnBrick(brickY);
+  board->Update();
 
-  // set game state ?
+  // set game state
 }
+
 
 void Game::Render() const
 {
