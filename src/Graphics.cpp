@@ -132,6 +132,7 @@ void Graphics::Render(Board* board) const {
 
 void Graphics::RenderBoard(Board* board) const {
 
+  // background
   SDL_Rect rect;
   rect.x = 0;
   rect.y = 0;
@@ -139,6 +140,19 @@ void Graphics::RenderBoard(Board* board) const {
   rect.h = WINDOW_HEIGHT;
   SDL_SetRenderDrawColor(renderer, 65, 112, 100, 255);
   SDL_RenderFillRect(renderer, &rect);
+
+  // draw BRICK
+  auto bricks = board->GetBricks();
+  for(auto b : bricks)
+  {
+    SDL_Rect brick;
+    brick.x = b->position.x;
+    brick.y = b->position.y;
+    brick.w = b->size;
+    brick.h = b->size;
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+    SDL_RenderFillRect(renderer, &brick);
+  }
 
 }
 

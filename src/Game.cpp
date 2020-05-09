@@ -8,7 +8,7 @@ Game::Game(int w, int h) : isRunning(false), width(w), height(h)
   // TODO: use smart pointer instead
   board = new Board();
   graphics = new Graphics(width, height);
-  ticksLastFrame = 0;
+  ticksLastFrame;
 }
 
 Game::~Game()
@@ -21,6 +21,12 @@ Game::~Game()
 void Game::Start()
 {
   isRunning = true;
+
+  // generate bricks TODO: make randomly generated at top of screen
+  float brickX = (float) width / 2;
+
+  // update board
+  board->SpawnBrick(brickX);
 }
 
 void Game::Update()
@@ -41,11 +47,11 @@ void Game::Update()
   board->CheckCollision(x, y); // if collision, mark to explode brick!
 
   // generate bricks TODO: make randomly generated at top of screen
-  float brickY = (float) width / 2;
+  //float brickX = (float) width / 2;
 
   // update board
-  board->SpawnBrick(brickY);
-  board->Update();
+  //board->SpawnBrick(brickX);
+  board->Update(deltaTime);
 
   // set game state
 }

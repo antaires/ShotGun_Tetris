@@ -7,7 +7,6 @@ int main(int argc, char* args[]){
   Game game(WINDOW_WIDTH, WINDOW_HEIGHT);
   game.Start();
 
-  // GAME LOOP
   while(game.IsRunning()){
     game.Update();
     game.Render();
