@@ -3,14 +3,15 @@
 #include "../lib/glm/glm.hpp"
 
 
-class Brick
+class Bullet
 {
 private:
 public:
+  glm::vec2 target;
   glm::vec2 position;
   glm::vec2 velocity;
   int size;
 
-  Brick(float x, float y, float v, int size);
+  Bullet(float x, float y, int size);
   void Update(float deltaTime);
 };

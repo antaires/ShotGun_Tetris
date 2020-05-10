@@ -75,7 +75,6 @@ bool Graphics::ProcessInput(int& x, int& y){
   return true;
 
   /*
-
       // control game state from user input
       if (event.key.keysym.sym == SDLK_RETURN){
         switch(gameState){
@@ -89,17 +88,6 @@ bool Graphics::ProcessInput(int& x, int& y){
             break;
         }
       }
-
-    }
-    case SDL_MOUSEBUTTONDOWN: {
-      SDL_GetMouseState(&x, &y);
-      break;
-    }
-    default: {
-      break;
-    }
-  }
-  return true;
   */
 }
 
@@ -116,9 +104,7 @@ void Graphics::Render(Board* board) const {
     case PLAYING:
       Graphics::RenderBoard(board);
       break;
-    case X_WIN:
-    case O_WIN:
-    case DRAW:
+    case GAME_OVER
       Graphics::RenderEndScreen(board, gameState);
       break;
     default:
@@ -141,7 +127,7 @@ void Graphics::RenderBoard(Board* board) const {
   SDL_SetRenderDrawColor(renderer, 65, 112, 100, 255);
   SDL_RenderFillRect(renderer, &rect);
 
-  // draw BRICK
+  // draw bricks
   auto bricks = board->GetBricks();
   for(auto b : bricks)
   {
@@ -152,6 +138,19 @@ void Graphics::RenderBoard(Board* board) const {
     brick.h = b->size;
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     SDL_RenderFillRect(renderer, &brick);
+  }
+
+  //draw bullets
+  auto bullets = board->GetBullets();
+  for(auto b : bullets)
+  {
+    SDL_Rect bullet;
+    bullet.x = b->position.x;
+    bullet.y = b->position.y;
+    bullet.w = b->size;
+    bullet.h = b->size;
+    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+    SDL_RenderFillRect(renderer, &bullet);
   }
 
 }

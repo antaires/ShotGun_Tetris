@@ -14,21 +14,25 @@ void Board::Update(float deltaTime)
     b->Update(deltaTime);
   }
 
+  for(auto b : bullets)
+  {
+    b->Update(deltaTime);
+  }
+
   // TODO: destroy offscreen bullets
 
   // TODO: destroy deactivated bricks
 }
 
-void Board::AddBullet(int x, int y)
+void Board::FireBullet(int x, int y)
 {
-  // x & y are target!
-  // set velocity to go from origin to
-  // origin is set at x = WIDTH & y = HEIGHT / 2
+  Bullet* bullet = new Bullet(x, y, BULLET_SIZE);
+  bullets.push_back(bullet);
 }
 
 void Board::SpawnBrick(float x)
 {
-  Brick* brick = new Brick(x, 0.0f, BRICK_SIZE);
+  Brick* brick = new Brick(x, 0.0f, 15.0f, BRICK_SIZE);
   bricks.push_back(brick);
 }
 
@@ -41,4 +45,9 @@ bool Board::CheckCollision(int x, int y)
 std::vector<Brick*> Board::GetBricks() const
 {
   return bricks;
+}
+
+std::vector<Bullet*> Board::GetBullets() const
+{
+  return bullets;
 }

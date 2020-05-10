@@ -1,6 +1,8 @@
 #include "Game.h"
 #include "Constants.h"
 
+#include <iostream>
+
 #include <SDL2/SDL.h>
 
 Game::Game(int w, int h) : isRunning(false), width(w), height(h)
@@ -40,8 +42,14 @@ void Game::Update()
   // use delta time to update my game objects
 
   // process ProcessInput
-  int x, y;
+  int x = -1, y = -1;
   if (!graphics->ProcessInput(x, y)){isRunning = false;}
+  if (x > 0 && y > 0)
+  {
+    // fire bullet
+    board->FireBullet(x, y);
+    std::cout<<"\nFire bullet: "<< x << " " << y;
+  }
 
   // check collisions
   board->CheckCollision(x, y); // if collision, mark to explode brick!
