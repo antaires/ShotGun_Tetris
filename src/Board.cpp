@@ -1,5 +1,7 @@
 #include "Board.h"
 
+#include "../lib/glm/glm.hpp"
+
 #include <iostream>
 
 Board::Board(){}
@@ -11,12 +13,18 @@ void Board::Update(float deltaTime)
   // update position of active bricks based on velocity
   for(auto b : bricks)
   {
-    b->Update(deltaTime);
+    if (b->IsActive())
+    {
+      b->Update(deltaTime);
+    }
   }
 
   for(auto b : bullets)
   {
-    b->Update(deltaTime);
+    if (b->IsActive())
+    {
+      b->Update(deltaTime);
+    }
   }
 
   // TODO: destroy offscreen bullets
@@ -36,9 +44,38 @@ void Board::SpawnBrick(float x)
   bricks.push_back(brick);
 }
 
-bool Board::CheckCollision(int x, int y)
+void Board::CheckCollision()
 {
-  // TODO: loop over active brick loc and check for collision
+  // TODO: loop over active brick loc and check for collision, deactivate
+  // bullets / bricks hit
+  for(auto brick : bricks)
+  {
+    if(brick->IsActive())
+    {
+      for(auto bullet : bullets)
+      {
+        if(bullet->IsActive())
+        {
+          if(Collision(brick, bullet))
+          {
+            brick->Kill();
+            bullet->Kill();
+          }
+        }
+      }
+    }
+  }
+}
+
+bool Board::Collision(Brick* brick, Bullet* bullet) const
+{
+  if (brick->position.x < bullet->position.x + bullet->size &&
+      brick->position.x + brick->size > bullet->position.x &&
+      brick->position.y < bullet->position.y + bullet->size &&
+      brick->position.y + brick->size > bullet->position.y)
+      {
+        return true;
+      }
   return false;
 }
 

@@ -131,26 +131,32 @@ void Graphics::RenderBoard(Board* board) const {
   auto bricks = board->GetBricks();
   for(auto b : bricks)
   {
-    SDL_Rect brick;
-    brick.x = b->position.x;
-    brick.y = b->position.y;
-    brick.w = b->size;
-    brick.h = b->size;
-    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-    SDL_RenderFillRect(renderer, &brick);
+    if (b->IsActive())
+    {
+      SDL_Rect brick;
+      brick.x = b->position.x;
+      brick.y = b->position.y;
+      brick.w = b->size;
+      brick.h = b->size;
+      SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+      SDL_RenderFillRect(renderer, &brick);
+    }
   }
 
   //draw bullets
   auto bullets = board->GetBullets();
   for(auto b : bullets)
   {
-    SDL_Rect bullet;
-    bullet.x = b->position.x;
-    bullet.y = b->position.y;
-    bullet.w = b->size;
-    bullet.h = b->size;
-    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-    SDL_RenderFillRect(renderer, &bullet);
+    if (b->IsActive())
+    {
+      SDL_Rect bullet;
+      bullet.x = b->position.x;
+      bullet.y = b->position.y;
+      bullet.w = b->size;
+      bullet.h = b->size;
+      SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+      SDL_RenderFillRect(renderer, &bullet);
+    }
   }
 
 }

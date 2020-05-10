@@ -52,7 +52,7 @@ void Game::Update()
   }
 
   // check collisions
-  board->CheckCollision(x, y); // if collision, mark to explode brick!
+  board->CheckCollision(); // if collision, mark to explode brick!
 
   // generate bricks TODO: make randomly generated at top of screen
   //float brickX = (float) width / 2;

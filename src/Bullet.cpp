@@ -5,6 +5,8 @@
 
 Bullet::Bullet(float x, float y, int size): size(size)
 {
+  isActive = true;
+
   target.x = x;
   target.y = y;
 
@@ -19,4 +21,14 @@ void Bullet::Update(float deltaTime)
   position.x = position.x + velocity.x * deltaTime;;
   position.y = position.y + velocity.y * deltaTime;
   // TODO: if position x or y offscreen, turn off bullet
+}
+
+void Bullet::Kill()
+{
+  isActive = false;
+}
+
+bool Bullet::IsActive() const
+{
+  return isActive;
 }
