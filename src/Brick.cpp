@@ -4,6 +4,7 @@
 Brick::Brick(float x, float y, float v, int size): size(size)
 {
   isActive = true;
+  isStatic = false;
 
   position.x = x;
   position.y = y;
@@ -29,4 +30,16 @@ void Brick::Kill()
 bool Brick::IsActive() const
 {
   return isActive;
+}
+
+void Brick::SetStatic()
+{
+  velocity.x = 0;
+  velocity.y = 0;
+  isStatic = true;
+}
+
+bool Brick::IsStatic() const
+{
+  return isStatic;
 }

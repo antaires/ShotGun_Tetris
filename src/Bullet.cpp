@@ -18,8 +18,8 @@ Bullet::Bullet(float x, float y, int size): size(size)
 
 void Bullet::Update(float deltaTime)
 {
-  position.x = position.x + velocity.x * deltaTime;;
-  position.y = position.y + velocity.y * deltaTime;
+  position.x = BULLET_SPEED + position.x + velocity.x * deltaTime;
+  position.y = BULLET_SPEED + position.y + velocity.y * deltaTime;
   // TODO: if position x or y offscreen, turn off bullet
 }
 

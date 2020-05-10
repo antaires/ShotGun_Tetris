@@ -12,8 +12,11 @@ class Board {
 private:
   // TODO: make smart pointers
   std::vector<Brick*> bricks;
+  std::vector<Brick*> staticBricks;
   std::vector<Bullet*> bullets;
-  bool Collision(Brick* brick, Bullet* bullet) const;
+  // TODO: abstract projectile class for both bullet & brick
+  bool CollisionBullet(Brick* brick, Bullet* bullet) const;
+  bool CollisionBrick(Brick* b1, Brick* b2) const;
 public:
   Board();
   ~Board();
@@ -23,4 +26,5 @@ public:
   void CheckCollision();
   std::vector<Brick*> GetBricks() const;
   std::vector<Bullet*> GetBullets() const;
+  std::vector<Brick*> GetStaticBricks() const;
 };

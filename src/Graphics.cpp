@@ -143,6 +143,22 @@ void Graphics::RenderBoard(Board* board) const {
     }
   }
 
+  // draw static bricks
+  auto staticBricks = board->GetStaticBricks();
+  for(auto b : staticBricks)
+  {
+    if (b->IsActive())
+    {
+      SDL_Rect brick;
+      brick.x = b->position.x;
+      brick.y = b->position.y;
+      brick.w = b->size;
+      brick.h = b->size;
+      SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+      SDL_RenderFillRect(renderer, &brick);
+    }
+  }
+
   //draw bullets
   auto bullets = board->GetBullets();
   for(auto b : bullets)

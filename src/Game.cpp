@@ -2,11 +2,15 @@
 #include "Constants.h"
 
 #include <iostream>
+#include <random>
+#include <time.h>
+#include <string>
 
 #include <SDL2/SDL.h>
 
 Game::Game(int w, int h) : isRunning(false), width(w), height(h)
 {
+  srand(time(NULL));
   // TODO: use smart pointer instead
   board = new Board();
   graphics = new Graphics(width, height);
@@ -15,7 +19,7 @@ Game::Game(int w, int h) : isRunning(false), width(w), height(h)
 
 Game::~Game()
 {
-  // TODO: causing seg fault
+  // TODO: delete all bullets/ bricks
   //delete graphics;
   //delete board;
 }
@@ -23,12 +27,6 @@ Game::~Game()
 void Game::Start()
 {
   isRunning = true;
-
-  // generate bricks TODO: make randomly generated at top of screen
-  float brickX = (float) width / 2;
-
-  // update board
-  board->SpawnBrick(brickX);
 }
 
 void Game::Update()
@@ -39,31 +37,47 @@ void Game::Update()
   deltaTime = (deltaTime > 0.05f) ? 0.05f : deltaTime;
   ticksLastFrame = SDL_GetTicks();
 
-  // use delta time to update my game objects
+  float brickX = Random(0, WINDOW_WIDTH - BRICK_SIZE);
+  board->SpawnBrick((float) Clamp((int)brickX));
 
   // process ProcessInput
   int x = -1, y = -1;
   if (!graphics->ProcessInput(x, y)){isRunning = false;}
   if (x > 0 && y > 0)
   {
-    // fire bullet
     board->FireBullet(x, y);
-    std::cout<<"\nFire bullet: "<< x << " " << y;
   }
 
-  // check collisions
-  board->CheckCollision(); // if collision, mark to explode brick!
+  board->CheckCollision();
 
-  // generate bricks TODO: make randomly generated at top of screen
-  //float brickX = (float) width / 2;
-
-  // update board
-  //board->SpawnBrick(brickX);
   board->Update(deltaTime);
 
   // set game state
 }
 
+float Game::Random(int min, int max)
+{
+  return rand() % (max - min + 1) + min;
+}
+
+int Game::Clamp(int num)
+{
+  // keep pos mult of 10 for even bricks
+  if (num == 0){return (int) num;}
+  if (num % 10 != 0)
+  {
+    std::string strNum = std::to_string(num);
+    int leastDigit = strNum.at(strNum.size()-1);
+    if (leastDigit >= 5)
+    {
+        return num + 10 - leastDigit;
+    } else
+    {
+        return num - leastDigit;
+    }
+  }
+  return num;
+}
 
 void Game::Render() const
 {
