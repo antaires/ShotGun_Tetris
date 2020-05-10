@@ -22,8 +22,13 @@ void Brick::Update(float deltaTime)
   float tempX = position.x + velocity.x * deltaTime;
   float tempY = position.y + velocity.y * deltaTime;
 
+  if (tempY >= WINDOW_HEIGHT + BRICK_SIZE)
+  {
+    tempY = WINDOW_HEIGHT + BRICK_SIZE;
+  }
+
   position.x = tempX;
-  position.y = tempY; //tempY > WINDOW_HEIGHT ? WINDOW_HEIGHT : (float) tempY;
+  position.y = tempY; 
 }
 
 void Brick::Kill()

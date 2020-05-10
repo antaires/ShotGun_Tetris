@@ -10,57 +10,48 @@ Board::~Board(){}
 
 void Board::Update(float deltaTime)
 {
-  // update position of active bricks based on velocity
-  for(auto b : bricks)
+  for(auto it = bricks.begin(); it != bricks.end(); ++it)
   {
+    Brick* b = it->first;
     if (b->IsActive())
     {
       b->Update(deltaTime);
     }
   }
 
-  for(auto b : bullets)
+  for(auto it = bullets.begin(); it != bullets.end(); ++it)
   {
+    Bullet* b = it->first;
     if (b->IsActive())
     {
       b->Update(deltaTime);
     }
   }
-
-  // TODO: move static bricks from bricks to staticBricks
-
-  // TODO: destroy offscreen bullets
-
-  // TODO: destroy deactivated bricks
 }
 
 void Board::FireBullet(int x, int y)
 {
   Bullet* bullet = new Bullet(x, y, BULLET_SIZE);
-  bullets.push_back(bullet);
+  bullets[bullet] = bullet;
 }
 
 void Board::SpawnBrick(float x, int r, int g, int b)
 {
   Brick* brick = new Brick(x, 0.0f, BRICK_SPEED, r, g, b, BRICK_SIZE);
-  bricks.push_back(brick);
+  bricks[brick] = brick;
 }
 
-void Board::CheckCollision()
+void Board::CheckCollisions()
 {
-  // TODO: loop over active brick loc and check for collision, deactivate
-  // bullets / bricks hit
-  std::vector<int> staticBrickIndex;
-  std::vector<int> deadBrickIndex;
-  for(int i = 0; i < bricks.size(); ++i) // TODO: switch to for loop, store indices to remove
+  for(auto it = bricks.begin(); it != bricks.end(); it++)
   {
-    Brick* brick = bricks.at(i);
+    Brick* brick = it->first;
     if(brick->IsActive())
     {
-      int deadBullet = -1;
-      for(int j = 0; j < bullets.size(); ++j)
+      Bullet* deadBullet = nullptr;
+      for(auto it2 = bullets.begin(); it2 != bullets.end(); it2++)
       {
-        Bullet* bullet = bullets.at(j);
+        Bullet* bullet = it2->first;
         if(bullet->IsActive())
         {
           // brick - bullet
@@ -68,56 +59,57 @@ void Board::CheckCollision()
           {
             brick->Kill();
             bullet->Kill();
-            deadBullet = j;
-            deadBrickIndex.push_back(i);
+            deadBullet = bullet;
+            bricksToKill[brick];
             break;
           }
         }
       }
-      // remove bullet
-      if (deadBullet >= 0) {bullets.erase(bullets.begin() + deadBullet);}
+      // remove dead bullet
+      if (deadBullet)
+      {
+        bullets.erase(deadBullet);
+        delete deadBullet;
+      }
 
-      // TODO: if collide with ground, set static & 0 velocity
+      // if collide with ground, set static & 0 velocity
       if (brick->position.y >= WINDOW_HEIGHT - BRICK_SIZE)
       {
         brick->SetStatic();
-        staticBrickIndex.push_back(i);
+        bricksToAddStatic[brick] = brick;
       }
 
-      // static brick collision
-      for(auto sb : staticBricks)
+      // check static brick collision
+      for(auto it3 = staticBricks.begin(); it3 != staticBricks.end(); it3++)
       {
+        Brick* sb = it3->first;
         if (CollisionBrick(brick, sb))
         {
           brick->SetStatic();
-          staticBrickIndex.push_back(i);
+          bricksToAddStatic[brick] = brick;
         }
       }
-
     }
   }
 
-  // remove dead bullets
-  for(int i : deadBrickIndex)
+  // remove dead bricks
+  for(auto it3 = bricksToKill.begin(); it3 != bricksToKill.end(); it3++)
   {
-    if (bricks.size() > i)
-    {
-      Brick* brick = bricks.at(i);
-      bricks.erase(bricks.begin() + i);
+    Brick* brick = it3->first;
+      bricks.erase(brick);
       delete brick;
-    }
   }
 
-  // remove static bullets and place in staticBullets
-  for(int i : staticBrickIndex)
+  // remove static bricks and place in staticBricks
+  for(auto it3 = bricksToAddStatic.begin(); it3 != bricksToAddStatic.end(); it3++)
   {
-    if (bricks.size() > i)
-    {
-      staticBricks.push_back(bricks.at(i));
-      bricks.erase(bricks.begin() + i);
-    }
+      Brick* brick = it3->first;
+      staticBricks[brick] = brick;
+      bricks.erase(brick);
   }
-  staticBrickIndex.clear();
+
+  bricksToKill.clear();
+  bricksToAddStatic.clear();
 
 }
 
@@ -146,17 +138,17 @@ bool Board::CollisionBrick(Brick* b1, Brick* b2) const
   return false;
 }
 
-std::vector<Brick*> Board::GetBricks() const
+std::unordered_map<Brick*, Brick*> Board::GetBricks() const
 {
   return bricks;
 }
 
-std::vector<Brick*> Board::GetStaticBricks() const
+std::unordered_map<Brick*, Brick*> Board::GetStaticBricks() const
 {
   return staticBricks;
 }
 
-std::vector<Bullet*> Board::GetBullets() const
+std::unordered_map<Bullet*, Bullet*> Board::GetBullets() const
 {
   return bullets;
 }

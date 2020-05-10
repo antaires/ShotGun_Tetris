@@ -1,6 +1,7 @@
 #include "Graphics.h"
 #include <iostream>
 #include <string>
+#include <unordered_map>
 
 SDL_Renderer* Graphics::renderer;
 SDL_Event Graphics::event;
@@ -129,8 +130,9 @@ void Graphics::RenderBoard(Board* board) const {
 
   // draw bricks
   auto bricks = board->GetBricks();
-  for(auto b : bricks)
+  for(auto it = bricks.begin(); it != bricks.end(); ++it)
   {
+    Brick* b = it->first;
     if (b->IsActive())
     {
       SDL_Rect brick;
@@ -145,8 +147,9 @@ void Graphics::RenderBoard(Board* board) const {
 
   // draw static bricks
   auto staticBricks = board->GetStaticBricks();
-  for(auto b : staticBricks)
+  for(auto it = staticBricks.begin(); it != staticBricks.end(); ++it)
   {
+    Brick* b = it->first;
     if (b->IsActive())
     {
       SDL_Rect brick;
@@ -161,8 +164,9 @@ void Graphics::RenderBoard(Board* board) const {
 
   //draw bullets
   auto bullets = board->GetBullets();
-  for(auto b : bullets)
+  for(auto it = bullets.begin(); it != bullets.end(); ++it)
   {
+    Bullet* b = it->first;
     if (b->IsActive())
     {
       SDL_Rect bullet;

@@ -55,7 +55,8 @@ void Game::Update()
     board->FireBullet(x, y);
   }
 
-  board->CheckCollision();
+  board->CheckCollisions();
+
 
   board->Update(deltaTime);
 
