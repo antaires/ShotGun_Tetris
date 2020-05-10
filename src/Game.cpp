@@ -57,10 +57,15 @@ void Game::Update()
 
   board->CheckCollisions();
 
+  if ( board->CheckBottomRow() )
+  {
+    // TODO: increase score
+  }
 
   board->Update(deltaTime);
 
   // set game state
+  // can increase speed etc based on score...
 }
 
 void Game::Render() const

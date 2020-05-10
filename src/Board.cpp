@@ -139,6 +139,42 @@ bool Board::CollisionBrick(Brick* b1, Brick* b2) const
   return false;
 }
 
+bool Board::CheckBottomRow()
+{
+  // sort static bricks by y and filter out those not on bottom
+  std::unordered_map<int, Brick*> bottomRow;
+  for(auto it = staticBricks.begin(); it != staticBricks.end(); ++it)
+  {
+    Brick* b = it->first;
+    if (b->position.y == WINDOW_HEIGHT - BRICK_SIZE)
+    {
+      int index = Clamp(b->position.x);
+      bottomRow[index] = b;
+    }
+  }
+
+  if (bottomRow.size() == WINDOW_WIDTH / BRICK_SIZE)
+  {
+    // TODO: flash bricks
+    // delete all bricks
+    for(auto it = bottomRow.begin(); it != bottomRow.end(); ++it)
+    {
+      Brick* b = it->second;
+      staticBricks.erase(b);
+      delete b;
+    }
+    // drop all static down 1 brick space
+    for(auto it = staticBricks.begin(); it != staticBricks.end(); ++it)
+    {
+      Brick* b = it->first;
+      b->SetPosition(Clamp(b->position.y + BRICK_SIZE));
+    }
+    return true;
+  }
+
+  return false;
+}
+
 std::unordered_map<Brick*, Brick*> Board::GetBricks() const
 {
   return bricks;
