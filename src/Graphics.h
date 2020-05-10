@@ -12,11 +12,11 @@
 
 class Graphics {
   private:
+    int width;
+    int height;
     TTF_Font* font;
     TTF_Font* LoadFont();
     void RenderBoard(Board* board) const;
-    int width;
-    int height;
   public:
     Graphics(int width, int height);
     ~Graphics();

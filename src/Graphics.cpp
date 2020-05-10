@@ -138,7 +138,7 @@ void Graphics::RenderBoard(Board* board) const {
       brick.y = b->position.y;
       brick.w = b->size;
       brick.h = b->size;
-      SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+      SDL_SetRenderDrawColor(renderer, b->red, b->green, b->blue, 255);
       SDL_RenderFillRect(renderer, &brick);
     }
   }
@@ -154,7 +154,7 @@ void Graphics::RenderBoard(Board* board) const {
       brick.y = b->position.y;
       brick.w = b->size;
       brick.h = b->size;
-      SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+      SDL_SetRenderDrawColor(renderer, b->red, b->green, b->blue, 255);
       SDL_RenderFillRect(renderer, &brick);
     }
   }

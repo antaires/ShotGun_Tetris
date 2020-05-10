@@ -12,8 +12,11 @@ public:
   int size;
   bool isActive;
   bool isStatic;
+  int red;
+  int green;
+  int blue;
 
-  Brick(float x, float y, float v, int size);
+  Brick(float x, float y, float v, int r, int g, int b, int size);
   void Update(float deltaTime);
   void Kill();
   bool IsActive() const;

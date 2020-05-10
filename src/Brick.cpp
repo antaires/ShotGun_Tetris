@@ -1,8 +1,12 @@
 #include "Brick.h"
 #include "Constants.h"
 
-Brick::Brick(float x, float y, float v, int size): size(size)
+Brick::Brick(float x, float y, float v, int r, int g, int b, int size): size(size)
 {
+  red   = r;
+  green = g;
+  blue  = b;
+
   isActive = true;
   isStatic = false;
 

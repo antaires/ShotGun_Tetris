@@ -1,16 +1,14 @@
 #include "Game.h"
 #include "Constants.h"
+#include "Random.h"
 
 #include <iostream>
-#include <random>
-#include <time.h>
 #include <string>
 
 #include <SDL2/SDL.h>
 
 Game::Game(int w, int h) : isRunning(false), width(w), height(h)
 {
-  srand(time(NULL));
   // TODO: use smart pointer instead
   board = new Board();
   graphics = new Graphics(width, height);
@@ -37,8 +35,17 @@ void Game::Update()
   deltaTime = (deltaTime > 0.05f) ? 0.05f : deltaTime;
   ticksLastFrame = SDL_GetTicks();
 
-  float brickX = Random(0, WINDOW_WIDTH - BRICK_SIZE);
-  board->SpawnBrick((float) Clamp((int)brickX));
+  Random *random = random->GetInstance();
+  if ( random->GetRand(0, 11) < 3 )
+  {
+    float brickX = random->GetRand(0, WINDOW_WIDTH - BRICK_SIZE);
+
+    int red   = (int) random->GetRand(0, 255);
+    int green = (int) random->GetRand(0, 255);
+    int blue  = (int) random->GetRand(0, 255);
+
+    board->SpawnBrick((float) Clamp((int)brickX), red, green, blue);
+  }
 
   // process ProcessInput
   int x = -1, y = -1;
@@ -55,28 +62,17 @@ void Game::Update()
   // set game state
 }
 
-float Game::Random(int min, int max)
-{
-  return rand() % (max - min + 1) + min;
-}
-
 int Game::Clamp(int num)
 {
-  // keep pos mult of 10 for even bricks
-  if (num == 0){return (int) num;}
-  if (num % 10 != 0)
-  {
-    std::string strNum = std::to_string(num);
-    int leastDigit = strNum.at(strNum.size()-1);
-    if (leastDigit >= 5)
-    {
-        return num + 10 - leastDigit;
-    } else
-    {
-        return num - leastDigit;
-    }
-  }
-  return num;
+  // get closet mult of BRICK_SIZE
+  if (num == 0){return num;}
+  int remainder = num % BRICK_SIZE;
+  if (remainder == 0){return num;}
+  if (remainder >= BRICK_SIZE / 2)
+  { // round up
+      return num + BRICK_SIZE - remainder;
+  } // round down
+  return num - remainder;
 }
 
 void Game::Render() const

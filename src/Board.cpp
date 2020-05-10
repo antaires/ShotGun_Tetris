@@ -40,9 +40,9 @@ void Board::FireBullet(int x, int y)
   bullets.push_back(bullet);
 }
 
-void Board::SpawnBrick(float x)
+void Board::SpawnBrick(float x, int r, int g, int b)
 {
-  Brick* brick = new Brick(x, 0.0f, BRICK_SPEED, BRICK_SIZE);
+  Brick* brick = new Brick(x, 0.0f, BRICK_SPEED, r, g, b, BRICK_SIZE);
   bricks.push_back(brick);
 }
 
@@ -117,6 +117,7 @@ void Board::CheckCollision()
       bricks.erase(bricks.begin() + i);
     }
   }
+  staticBrickIndex.clear();
 
 }
 
@@ -135,8 +136,8 @@ bool Board::CollisionBullet(Brick* brick, Bullet* bullet) const
 
 bool Board::CollisionBrick(Brick* b1, Brick* b2) const
 {
-  if (b1->position.x < b2->position.x + b2->size &&
-      b1->position.x + b1->size > b2->position.x &&
+  if (b1->position.x < b2->position.x + (b2->size - GRACE) &&
+      b1->position.x + (b1->size - GRACE) > b2->position.x &&
       b1->position.y < b2->position.y + b2->size &&
       b1->position.y + b1->size > b2->position.y)
       {

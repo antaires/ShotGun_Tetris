@@ -21,7 +21,7 @@ public:
   Board();
   ~Board();
   void Update(float deltaTime);
-  void SpawnBrick(float y);
+  void SpawnBrick(float y, int r, int g, int b);
   void FireBullet(int x, int y);
   void CheckCollision();
   std::vector<Brick*> GetBricks() const;
