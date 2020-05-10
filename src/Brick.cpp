@@ -28,11 +28,15 @@ void Brick::Update(float deltaTime)
   }
 
   position.x = tempX;
-  position.y = tempY; 
+  position.y = tempY;
 }
 
 void Brick::Kill()
 {
+  // TODO: flashing colors / explosion here
+  red   = 255;
+  green = 0;
+  blue  = 0;
   isActive = false;
 }
 
@@ -51,4 +55,9 @@ void Brick::SetStatic()
 bool Brick::IsStatic() const
 {
   return isStatic;
+}
+
+void Brick::SetPosition(int y)
+{
+  position.y = y;
 }

@@ -22,4 +22,5 @@ public:
   bool IsActive() const;
   void SetStatic();
   bool IsStatic() const;
+  void SetPosition(int y);
 };

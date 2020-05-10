@@ -36,7 +36,7 @@ void Game::Update()
   ticksLastFrame = SDL_GetTicks();
 
   Random *random = random->GetInstance();
-  if ( random->GetRand(0, 11) < 3 )
+  if ( random->GetRand(0, 31) < 3 )
   {
     float brickX = random->GetRand(0, WINDOW_WIDTH - BRICK_SIZE);
 
@@ -61,19 +61,6 @@ void Game::Update()
   board->Update(deltaTime);
 
   // set game state
-}
-
-int Game::Clamp(int num)
-{
-  // get closet mult of BRICK_SIZE
-  if (num == 0){return num;}
-  int remainder = num % BRICK_SIZE;
-  if (remainder == 0){return num;}
-  if (remainder >= BRICK_SIZE / 2)
-  { // round up
-      return num + BRICK_SIZE - remainder;
-  } // round down
-  return num - remainder;
 }
 
 void Game::Render() const

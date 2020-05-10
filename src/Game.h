@@ -10,7 +10,6 @@ class Game {
     int width;
     int height;
     float ticksLastFrame;
-    int Clamp(int num);
   public:
     Game(int w, int h);
     ~Game();

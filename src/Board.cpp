@@ -85,6 +85,7 @@ void Board::CheckCollisions()
         Brick* sb = it3->first;
         if (CollisionBrick(brick, sb))
         {
+          brick->SetPosition(Clamp(brick->position.y));
           brick->SetStatic();
           bricksToAddStatic[brick] = brick;
         }
