@@ -29,7 +29,7 @@ public:
   void SpawnBrick(float y, int r, int g, int b);
   void FireBullet(int x, int y);
   void CheckCollisions();
-  bool CheckBottomRow();
+  bool CheckRows();
   std::unordered_map<Brick*, Brick*> GetBricks() const;
   std::unordered_map<Bullet*, Bullet*> GetBullets() const;
   std::unordered_map<Brick*, Brick*> GetStaticBricks() const;

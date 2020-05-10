@@ -37,7 +37,7 @@ void Board::FireBullet(int x, int y)
 
 void Board::SpawnBrick(float x, int r, int g, int b)
 {
-  Brick* brick = new Brick(x, 0.0f, BRICK_SPEED, r, g, b, BRICK_SIZE);
+  Brick* brick = new Brick(x, -BRICK_SIZE * 5, BRICK_SPEED, r, g, b, BRICK_SIZE);
   bricks[brick] = brick;
 }
 
@@ -139,8 +139,11 @@ bool Board::CollisionBrick(Brick* b1, Brick* b2) const
   return false;
 }
 
-bool Board::CheckBottomRow()
+bool Board::CheckRows()
 {
+  // TODO: check ALL rows, store in 2d map sorted by row
+  // if 1 row full, remove it and lower ALL bricks ABOVE it
+
   // sort static bricks by y and filter out those not on bottom
   std::unordered_map<int, Brick*> bottomRow;
   for(auto it = staticBricks.begin(); it != staticBricks.end(); ++it)

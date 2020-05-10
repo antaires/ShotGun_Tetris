@@ -61,3 +61,13 @@ void Brick::SetPosition(int y)
 {
   position.y = y;
 }
+
+void Brick::SetFriend(Brick* brick)
+{
+  friends[brick] = brick;
+}
+
+std::unordered_map<Brick*, Brick*> Brick::GetFriends()
+{
+  return friends;
+}

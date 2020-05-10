@@ -13,6 +13,7 @@ Game::Game(int w, int h) : isRunning(false), width(w), height(h)
   board = new Board();
   graphics = new Graphics(width, height);
   ticksLastFrame;
+  score = 0;
 }
 
 Game::~Game()
@@ -38,7 +39,12 @@ void Game::Update()
   Random *random = random->GetInstance();
   if ( random->GetRand(0, 31) < 3 )
   {
+    // place center brick
     float brickX = random->GetRand(0, WINDOW_WIDTH - BRICK_SIZE);
+
+    // build shape 'friends'
+    int shapeIndex = (int) random->GetRand(0, 5);
+    // based on shape, built randomly rotated group of bricks, all same color
 
     int red   = (int) random->GetRand(0, 255);
     int green = (int) random->GetRand(0, 255);
@@ -57,9 +63,10 @@ void Game::Update()
 
   board->CheckCollisions();
 
-  if ( board->CheckBottomRow() )
+  if ( board->CheckRows() )
   {
-    // TODO: increase score
+    score++; // TODO: display score / UI
+    std::cout<<"\nscore: "<<score;
   }
 
   board->Update(deltaTime);

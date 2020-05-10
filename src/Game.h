@@ -10,6 +10,7 @@ class Game {
     int width;
     int height;
     float ticksLastFrame;
+    int score;
   public:
     Game(int w, int h);
     ~Game();
