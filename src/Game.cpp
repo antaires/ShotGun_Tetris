@@ -1,6 +1,6 @@
 #include "Game.h"
 #include "Constants.h"
-#include "Random.h"
+#include "Shape.h"
 
 #include <iostream>
 #include <string>
@@ -14,6 +14,8 @@ Game::Game(int w, int h) : isRunning(false), width(w), height(h)
   graphics = new Graphics(width, height);
   ticksLastFrame;
   score = 0;
+
+  random = new Random();
 }
 
 Game::~Game()
@@ -36,21 +38,9 @@ void Game::Update()
   deltaTime = (deltaTime > 0.05f) ? 0.05f : deltaTime;
   ticksLastFrame = SDL_GetTicks();
 
-  Random *random = random->GetInstance();
   if ( random->GetRand(0, 31) < 3 )
   {
-    // place center brick
-    float brickX = random->GetRand(0, WINDOW_WIDTH - BRICK_SIZE);
-
-    // build shape 'friends'
-    int shapeIndex = (int) random->GetRand(0, 5);
-    // based on shape, built randomly rotated group of bricks, all same color
-
-    int red   = (int) random->GetRand(0, 255);
-    int green = (int) random->GetRand(0, 255);
-    int blue  = (int) random->GetRand(0, 255);
-
-    board->SpawnBrick((float) Clamp((int)brickX), red, green, blue);
+    board->SpawnShape(random);
   }
 
   // process ProcessInput

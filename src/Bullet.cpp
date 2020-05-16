@@ -20,7 +20,15 @@ void Bullet::Update(float deltaTime)
 {
   position.x = (position.x + (velocity.x * BULLET_SPEED) * deltaTime);
   position.y = (position.y + (velocity.y * BULLET_SPEED) * deltaTime);
-  // TODO: if position x or y offscreen, turn off bullet
+
+  // if position x or y offscreen, turn off bullet
+  if (position.x > WINDOW_WIDTH
+    || position.x < 0
+    || position.y > WINDOW_HEIGHT
+    || position.y < 0)
+    {
+      isActive = false;
+    }
 }
 
 void Bullet::Kill()

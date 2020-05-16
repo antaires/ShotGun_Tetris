@@ -34,9 +34,6 @@ void Brick::Update(float deltaTime)
 void Brick::Kill()
 {
   // TODO: flashing colors / explosion here
-  red   = 255;
-  green = 0;
-  blue  = 0;
   isActive = false;
 }
 
@@ -50,6 +47,7 @@ void Brick::SetStatic()
   velocity.x = 0;
   velocity.y = 0;
   isStatic = true;
+  // todo move this here? SetPosition(Clamp(brick->position.y));
 }
 
 bool Brick::IsStatic() const
@@ -60,14 +58,4 @@ bool Brick::IsStatic() const
 void Brick::SetPosition(int y)
 {
   position.y = y;
-}
-
-void Brick::SetFriend(Brick* brick)
-{
-  friends[brick] = brick;
-}
-
-std::unordered_map<Brick*, Brick*> Brick::GetFriends()
-{
-  return friends;
 }

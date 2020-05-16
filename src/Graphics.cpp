@@ -1,4 +1,5 @@
 #include "Graphics.h"
+#include "Shape.h"
 #include <iostream>
 #include <string>
 #include <unordered_map>
@@ -129,19 +130,24 @@ void Graphics::RenderBoard(Board* board) const {
   SDL_RenderFillRect(renderer, &rect);
 
   // draw bricks
-  auto bricks = board->GetBricks();
-  for(auto it = bricks.begin(); it != bricks.end(); ++it)
+  auto shapes = board->GetShapes();
+  for(auto itShapes = shapes.begin(); itShapes != shapes.end(); itShapes++)
   {
-    Brick* b = it->first;
-    if (b->IsActive())
+    Shape* shape = itShapes->first;
+    auto bricks = shape->GetBricks();
+    for(auto it = bricks.begin(); it != bricks.end(); ++it)
     {
-      SDL_Rect brick;
-      brick.x = b->position.x;
-      brick.y = b->position.y;
-      brick.w = b->size;
-      brick.h = b->size;
-      SDL_SetRenderDrawColor(renderer, b->red, b->green, b->blue, 255);
-      SDL_RenderFillRect(renderer, &brick);
+      Brick* b = it->first;
+      if (b->IsActive())
+      {
+        SDL_Rect brick;
+        brick.x = b->position.x;
+        brick.y = b->position.y;
+        brick.w = b->size;
+        brick.h = b->size;
+        SDL_SetRenderDrawColor(renderer, b->red, b->green, b->blue, 255);
+        SDL_RenderFillRect(renderer, &brick);
+      }
     }
   }
 

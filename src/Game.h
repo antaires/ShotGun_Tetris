@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Graphics.h"
+#include "Random.h"
 
 class Game {
   private:
@@ -11,6 +12,7 @@ class Game {
     int height;
     float ticksLastFrame;
     int score;
+    Random* random;
   public:
     Game(int w, int h);
     ~Game();

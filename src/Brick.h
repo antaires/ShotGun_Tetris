@@ -2,6 +2,7 @@
 
 #include "../lib/glm/glm.hpp"
 #include <unordered_map>
+#include <vector>
 
 class Brick
 {
@@ -9,7 +10,6 @@ private:
 public:
   glm::vec2 position;
   glm::vec2 velocity;
-  std::unordered_map<Brick*, Brick*> friends;
   int size;
   bool isActive;
   bool isStatic;
@@ -24,6 +24,4 @@ public:
   void SetStatic();
   bool IsStatic() const;
   void SetPosition(int y);
-  void SetFriend(Brick* brick);
-  std::unordered_map<Brick*, Brick*> GetFriends(); // can't be const because if shot, must delete
 };

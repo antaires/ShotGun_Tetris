@@ -10,13 +10,10 @@ Board::~Board(){}
 
 void Board::Update(float deltaTime)
 {
-  for(auto it = bricks.begin(); it != bricks.end(); ++it)
+  for(auto it = shapes.begin(); it != shapes.end(); ++it)
   {
-    Brick* b = it->first;
-    if (b->IsActive())
-    {
-      b->Update(deltaTime);
-    }
+    Shape* shape = it->first;
+    shape->Update(deltaTime);
   }
 
   for(auto it = bullets.begin(); it != bullets.end(); ++it)
@@ -35,83 +32,143 @@ void Board::FireBullet(int x, int y)
   bullets[bullet] = bullet;
 }
 
-void Board::SpawnBrick(float x, int r, int g, int b)
+Shape* Board::SpawnShape(Random* random)
 {
-  Brick* brick = new Brick(x, -BRICK_SIZE * 5, BRICK_SPEED, r, g, b, BRICK_SIZE);
-  bricks[brick] = brick;
+  // add shape to list of active SHAPES
+  Shape* shape = new Shape(random);
+  shapes[shape] = shape;
+  return shape;
 }
 
 void Board::CheckCollisions()
 {
-  for(auto it = bricks.begin(); it != bricks.end(); it++)
+
+  for(auto itShapes = shapes.begin(); itShapes != shapes.end(); itShapes++)
   {
-    Brick* brick = it->first;
-    if(brick->IsActive())
+    Shape* shape = itShapes->first;
+
+    // COLLISION SHAPE - BULLET
+    Bullet* deadBullet = nullptr;
+    for(auto itBullets = bullets.begin(); itBullets != bullets.end(); itBullets++)
     {
-      Bullet* deadBullet = nullptr;
-      for(auto it2 = bullets.begin(); it2 != bullets.end(); it2++)
+      Bullet* bullet = itBullets->first;
+      if(bullet->IsActive()) // todo need to check this? I remove dead bullets
       {
-        Bullet* bullet = it2->first;
-        if(bullet->IsActive())
+        if(CollisionShape(shape, bullet))
         {
-          // brick - bullet
-          if(CollisionBullet(brick, bullet))
+          std::cout<<"\ncollision bullet - shape bounding box";
+          // todo - it seems that the shape bounding box if off? 
+          auto bricks = shape->GetBricks();
+          for(auto itBricks = bricks.begin(); itBricks != bricks.end(); itBricks++)
           {
-            brick->Kill();
-            bullet->Kill();
-            deadBullet = bullet;
-            bricksToKill[brick];
-            break;
+            Brick* brick = itBricks->first;
+            if (CollisionBullet(brick, bullet))
+            {
+              std::cout<<"\ncollision bullet - single brick";
+              shape->RemoveBrick(brick);
+              brick->Kill();
+              bullet->Kill();
+              deadBullet = bullet;
+              // todo -> free memory for brick here?
+              //bricksToKill[brick];
+              // break;
+            }
           }
         }
       }
-      // remove dead bullet
-      if (deadBullet)
+      else
       {
-        bullets.erase(deadBullet);
-        delete deadBullet;
+        bulletsToRemove[bullet] = bullet;
       }
+    }
+    // remove dead bullet for next shape
+    if (deadBullet)
+    {
+      bullets.erase(deadBullet);
+      delete deadBullet;
+    }
+    // remove offscreen bullets
+    RemoveDeadBullets();
 
-      // if collide with ground, set static & 0 velocity
-      if (brick->position.y >= WINDOW_HEIGHT - BRICK_SIZE)
+    // COLLISION SHAPE - GROUND
+    if (shape->position.y >= WINDOW_HEIGHT - shape->height)
+    {
+      auto bricks = shape->GetBricks();
+      for (auto itBricks = bricks.begin(); itBricks != bricks.end(); itBricks++)
       {
-        brick->SetStatic();
-        bricksToAddStatic[brick] = brick;
+        Brick* b = itBricks->first;
+        shape->RemoveBrick(b);
+        b->SetStatic();
+        b->SetPosition(Clamp(b->position.y));
+        bricksToAddStatic[b] = b;
       }
+      // todo skip to next shape at this point?
+    }
 
-      // check static brick collision
-      for(auto it3 = staticBricks.begin(); it3 != staticBricks.end(); it3++)
+    // COLLISION SHAPE - STATIC BRICKS
+    for(auto itStatic = staticBricks.begin(); itStatic != staticBricks.end(); itStatic++)
+    {
+      Brick* sb = itStatic->first;
+      if (CollisionShapeBrick(shape, sb))
       {
-        Brick* sb = it3->first;
-        if (CollisionBrick(brick, sb))
+        bool hasCollision = false;
+        auto bricks = shape->GetBricks();
+        for(auto itBricks = bricks.begin(); itBricks != bricks.end(); itBricks++)
         {
-          brick->SetPosition(Clamp(brick->position.y));
-          brick->SetStatic();
-          bricksToAddStatic[brick] = brick;
+          Brick* brick = itBricks->first;
+          if (CollisionBrick(brick, sb))
+          {
+            hasCollision = true;
+            break;
+          }
+        }
+        if (hasCollision)
+        {
+          for(auto itBricks = bricks.begin(); itBricks != bricks.end(); itBricks++)
+          {
+            Brick* brick = itBricks->first;
+            shape->RemoveBrick(brick);
+            brick->SetPosition(Clamp(brick->position.y));
+            brick->SetStatic();
+            bricksToAddStatic[brick] = brick;
+          }
         }
       }
     }
+
+    if (shape->IsEmpty())
+    {
+      emptyShapes[shape] = shape;
+    }
   }
 
-  // remove dead bricks
-  for(auto it3 = bricksToKill.begin(); it3 != bricksToKill.end(); it3++)
-  {
-    Brick* brick = it3->first;
-      bricks.erase(brick);
-      delete brick;
-  }
+  //RemoveDeadBricks();
+  UpdateStaticBricks();
+  RemoveEmptyShapes();
+}
 
-  // remove static bricks and place in staticBricks
-  for(auto it3 = bricksToAddStatic.begin(); it3 != bricksToAddStatic.end(); it3++)
-  {
-      Brick* brick = it3->first;
-      staticBricks[brick] = brick;
-      bricks.erase(brick);
-  }
+bool Board::CollisionShape(Shape* shape, Bullet* bullet) const
+{
+  if (shape->position.x < bullet->position.x + bullet->size &&
+      shape->position.x + shape->width > bullet->position.x &&
+      shape->position.y < bullet->position.y + bullet->size &&
+      shape->position.y + shape->height > bullet->position.y)
+      {
+        return true;
+      }
+  return false;
+}
 
-  bricksToKill.clear();
-  bricksToAddStatic.clear();
-
+bool Board::CollisionShapeBrick(Shape* shape, Brick* brick) const
+{
+  if (shape->position.x < brick->position.x + brick->size &&
+      shape->position.x + shape->width > brick->position.x &&
+      shape->position.y < brick->position.y + brick->size &&
+      shape->position.y + shape->height > brick->position.y)
+      {
+        return true;
+      }
+  return false;
 }
 
 bool Board::CollisionBullet(Brick* brick, Bullet* bullet) const
@@ -137,6 +194,50 @@ bool Board::CollisionBrick(Brick* b1, Brick* b2) const
         return true;
       }
   return false;
+}
+
+/* TODO needed? replaced with shapes ...
+void Board::RemoveDeadBricks()
+{
+  for(auto it3 = bricksToKill.begin(); it3 != bricksToKill.end(); it3++)
+  {
+    Brick* brick = it3->first;
+      bricks.erase(brick);
+      delete brick;
+  }
+  bricksToKill.clear();
+}*/
+
+void Board::UpdateStaticBricks()
+{
+  for(auto it3 = bricksToAddStatic.begin(); it3 != bricksToAddStatic.end(); it3++)
+  {
+      Brick* brick = it3->first;
+      staticBricks[brick] = brick;
+      // bricks.erase(brick);
+  }
+  bricksToAddStatic.clear();
+}
+
+void Board::RemoveEmptyShapes()
+{
+  for(auto it = emptyShapes.begin(); it != emptyShapes.end(); it++)
+  {
+    Shape* shape = it->first;
+    shapes.erase(shape);
+  }
+  emptyShapes.clear();
+}
+
+void Board::RemoveDeadBullets()
+{
+  for(auto it = bulletsToRemove.begin(); it != bulletsToRemove.end(); it++)
+  {
+    Bullet* bullet = it->first;
+    bullets.erase(bullet);
+    // todo delete bullet here
+  }
+  bulletsToRemove.clear();
 }
 
 bool Board::CheckRows()
@@ -178,9 +279,10 @@ bool Board::CheckRows()
   return false;
 }
 
-std::unordered_map<Brick*, Brick*> Board::GetBricks() const
+std::unordered_map<Shape*, Shape*>  Board::GetShapes() const
 {
-  return bricks;
+  // TODO - alternately, could loop over shapes and make list of bricks?
+  return shapes;
 }
 
 std::unordered_map<Brick*, Brick*> Board::GetStaticBricks() const

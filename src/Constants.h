@@ -16,8 +16,6 @@ const unsigned int BULLET_SIZE = 5;
 
 const unsigned int FRAME_TARGET_TIME = 60;
 
-enum class Shapes { Single = 0, Bar = 1, Hook = 2, Square = 3, Zag = 4};
-
 static int Clamp(int num)
 {
   // get closet mult of BRICK_SIZE
