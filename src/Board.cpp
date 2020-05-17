@@ -56,15 +56,13 @@ void Board::CheckCollisions()
       {
         if(CollisionShape(shape, bullet))
         {
-          std::cout<<"\ncollision bullet - shape bounding box";
-          // todo - it seems that the shape bounding box if off? 
+          // todo - it seems that the shape bounding box if off?
           auto bricks = shape->GetBricks();
           for(auto itBricks = bricks.begin(); itBricks != bricks.end(); itBricks++)
           {
             Brick* brick = itBricks->first;
             if (CollisionBullet(brick, bullet))
             {
-              std::cout<<"\ncollision bullet - single brick";
               shape->RemoveBrick(brick);
               brick->Kill();
               bullet->Kill();

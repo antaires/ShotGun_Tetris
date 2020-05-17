@@ -11,8 +11,9 @@ enum Shapes { Single = 0, Bar = 1, Hook = 2, Square = 3, Zag = 4};
 class Shape
 {
 private:
+  Brick* mainBrick;
   std::unordered_map<Brick*, Brick*> bricks;
-  void SpawnBrick(float x, float y, int r, int g, int b);
+  Brick* SpawnBrick(float x, float y, int r, int g, int b);
   void SpawnSingle(float brickX, int red, int green, int blue);
   void SpawnBar(float centerBrickX, int red, int green, int blue);
 public:

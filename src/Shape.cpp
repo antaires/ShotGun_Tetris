@@ -20,7 +20,7 @@ Shape::Shape(Random* random)
   height = BRICK_SIZE;
   width = BRICK_SIZE;
 
-  SpawnBrick((float) Clamp((int)xOrigin), 0, red, green, blue);
+  mainBrick = SpawnBrick((float) Clamp((int)xOrigin), 0, red, green, blue);
 
   /*
   // todo : set position and height / width depending on shape
@@ -40,10 +40,11 @@ Shape::Shape(Random* random)
   } */
 }
 
-void Shape::SpawnBrick(float x, float y, int r, int g, int b)
+Brick* Shape::SpawnBrick(float x, float y, int r, int g, int b)
 {
   Brick* brick = new Brick(x, y, BRICK_SPEED, r, g, b, BRICK_SIZE);
   bricks[brick] = brick;
+  return brick;
 }
 
 void Shape::SpawnSingle(float brickX, int red, int green, int blue)
@@ -133,4 +134,7 @@ void Shape::Update(float deltaTime)
     b->Update(deltaTime);
     //}
   }
+  // todo don't even store here?
+  position.x = mainBrick->position.x;
+  position.y = mainBrick->position.y;
 }
