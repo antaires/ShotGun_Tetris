@@ -1,12 +1,20 @@
 #include "Shape.h"
 #include "Constants.h"
+#include <cmath>
 
-Shape::Shape(Random* random)
+Shape::Shape(Random* random, float prevPos)
 {
+
   // create bricks according to type -- memory for bricks
   // is requested here, but not destroyed when the shape is - rather
   // a brick is only destroyed once its 'row line' is erased
-  float xOrigin = random->GetRand(0, WINDOW_WIDTH - BRICK_SIZE);
+
+  // prevent shapes spawning over other shapes
+  float xOrigin = prevPos;
+  while (std::abs(xOrigin - prevPos) < BRICK_SIZE * 5)
+  {
+    xOrigin = random->GetRand(0, WINDOW_WIDTH - BRICK_SIZE);
+  }
 
   int red   = (int) random->GetRand(0, 255);
   int green = (int) random->GetRand(0, 255);
@@ -23,8 +31,10 @@ Shape::Shape(Random* random)
       break;
     case Shapes::Bar:
       SpawnBar(xOrigin, red, green, blue, rotate);
+      break;
     case Shapes::Square:
       SpawnSquare(xOrigin, red, green, blue);
+      break;
     default:
       SpawnSingle(xOrigin, red, green, blue);
       break;

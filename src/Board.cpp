@@ -5,7 +5,10 @@
 #include <iostream>
 #include <cmath>
 
-Board::Board(){}
+Board::Board()
+{
+  lastShapeSpawnPosition = 0;
+}
 
 Board::~Board(){}
 
@@ -36,7 +39,8 @@ void Board::FireBullet(int x, int y)
 Shape* Board::SpawnShape(Random* random)
 {
   // add shape to list of active SHAPES
-  Shape* shape = new Shape(random);
+  Shape* shape = new Shape(random, lastShapeSpawnPosition);
+  lastShapeSpawnPosition = shape->position.x;
   shapes[shape] = shape;
   return shape;
 }

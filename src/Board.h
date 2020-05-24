@@ -12,6 +12,7 @@
 
 class Board {
 private:
+  float lastShapeSpawnPosition;
   // TODO: make smart pointers
   std::unordered_map<Shape*, Shape*> shapes;
   std::unordered_map<Brick*, Brick*> staticBricks;

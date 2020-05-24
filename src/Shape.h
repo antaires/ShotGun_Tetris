@@ -22,7 +22,7 @@ public:
   glm::vec2 velocity;
   int height;
   int width;
-  Shape(Random* random);
+  Shape(Random* random, float prevPos);
   std::unordered_map<Brick*, Brick*> GetBricks();
   void RemoveBrick(Brick* brick);
   bool IsEmpty();
