@@ -10,8 +10,8 @@ Bullet::Bullet(float x, float y, int size): size(size)
   target.x = x;
   target.y = y;
 
-  position.x = (float) WINDOW_WIDTH;
-  position.y = (float) (WINDOW_HEIGHT / 2);
+  position.x = (float) (WINDOW_WIDTH / 2);
+  position.y = (float) WINDOW_HEIGHT;
 
   velocity = glm::normalize(target-position);
 }

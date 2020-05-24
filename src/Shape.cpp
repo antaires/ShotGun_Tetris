@@ -13,31 +13,22 @@ Shape::Shape(Random* random)
   int blue  = (int) random->GetRand(0, 255);
 
   int shapeIndex = (int) random->GetRand(0, 5);
+  bool rotate    = (int) random->GetRand(0, 1);
+  bool mirror    = (int) random->GetRand(0, 1);
 
-  // todo update for other SHAPES
-  position.x = xOrigin;
-  position.y = 0;
-  height = BRICK_SIZE;
-  width = BRICK_SIZE;
-
-  mainBrick = SpawnBrick((float) Clamp((int)xOrigin), 0, red, green, blue);
-
-  /*
-  // todo : set position and height / width depending on shape
   switch(shapeIndex)
   {
     case Shapes::Single:
-      //SpawnSingle(xOrigin, red, green, blue);
-      SpawnBrick((float) Clamp((int)xOrigin), 0, red, green, blue);
+      SpawnSingle(xOrigin, red, green, blue);
       break;
     case Shapes::Bar:
-      //SpawnBar(xOrigin, red, green, blue);
-      SpawnBrick((float) Clamp((int)xOrigin), 0, red, green, blue);
+      SpawnBar(xOrigin, red, green, blue, rotate);
+    case Shapes::Square:
+      SpawnSquare(xOrigin, red, green, blue);
     default:
-      //SpawnSingle(xOrigin, red, green, blue);
-      SpawnBrick((float) Clamp((int)xOrigin), 0, red, green, blue);
+      SpawnSingle(xOrigin, red, green, blue);
       break;
-  } */
+  }
 }
 
 Brick* Shape::SpawnBrick(float x, float y, int r, int g, int b)
@@ -47,66 +38,66 @@ Brick* Shape::SpawnBrick(float x, float y, int r, int g, int b)
   return brick;
 }
 
-void Shape::SpawnSingle(float brickX, int red, int green, int blue)
+void Shape::SpawnSingle(float xOrigin, int red, int green, int blue)
 {
-  // board->SpawnBrick((float) Clamp((int)brickX), 0, red, green, blue);
+  mainBrick = SpawnBrick((float) Clamp((int)xOrigin), 0, red, green, blue);
+
+  position.x = xOrigin;
+  position.y = 0;
+  velocity.x = mainBrick->velocity.x;
+  velocity.y = mainBrick->velocity.y;
+  height = BRICK_SIZE;
+  width = BRICK_SIZE;
 }
 
-void Shape::SpawnBar(float x_, int red, int green, int blue)
+void Shape::SpawnBar(float xOrigin, int red, int green, int blue, bool rotate)
 {
-  /*
-  float x = (float) Clamp((int)x);
-  std::vector<Brick*> shape;
-  Random *random = random->GetInstance();
-  if ( random->GetRand(1, 10) < 5 )
+  // VERTICAL
+  if (rotate)
   {
-    for(int i = 0; i < 4; ++i)
+    mainBrick = SpawnBrick((float) Clamp((int)xOrigin), 0, red, green, blue);
+    for(int i = 1; i < 4; ++i)
     {
-      shape.push_back(board->SpawnBrick(x, BRICK_SIZE * i, red, green, blue));
+      SpawnBrick((float) Clamp((int)xOrigin), BRICK_SIZE * i, red, green, blue);
     }
-    for(auto b: shape)
-    {
-      for(auto p: shape)
-      {
-        b->SetFriend(p);
-        p->SetFriend(b);
-      }
-    }
+    position.x = xOrigin;
+    position.y = 0;
+    height = BRICK_SIZE;
+    width = BRICK_SIZE * 4;
+    velocity.x = mainBrick->velocity.x;
+    velocity.y = mainBrick->velocity.y;
   }
+
+  // HORIZONTAL
   else
   {
-    if (x - (BRICK_SIZE * 5) < 0)
+    mainBrick = SpawnBrick((float) Clamp((int)xOrigin), 0, red, green, blue);
+    for(int i = 0; i < 3; ++i)
     {
-      for(int i = 0; i < 4; ++i)
-      {
-        shape.push_back(board->SpawnBrick(x + BRICK_SIZE * i, 0, red, green, blue));
-      }
-      for(auto b: shape)
-      {
-        for(auto p: shape)
-        {
-          b->SetFriend(p);
-          p->SetFriend(b);
-        }
-      }
+      SpawnBrick((float) Clamp((int)xOrigin + BRICK_SIZE * i), 0, red, green, blue);
     }
-    else
-    {
-      for(int i = 0; i < 4; ++i)
-      {
-        shape.push_back(board->SpawnBrick(x - BRICK_SIZE * i, 0, red, green, blue));
-      }
-      for(auto b: shape)
-      {
-        for(auto p: shape)
-        {
-          b->SetFriend(p);
-          p->SetFriend(b);
-        }
-      }
-    }
+    position.x = xOrigin;
+    position.y = 0;
+    height = BRICK_SIZE * 4;
+    width = BRICK_SIZE;
+    velocity.x = mainBrick->velocity.x;
+    velocity.y = mainBrick->velocity.y;
   }
-  */
+}
+
+void Shape::SpawnSquare(float xOrigin, int red, int green, int blue)
+{
+  mainBrick = SpawnBrick((float) Clamp((int)xOrigin), 0, red, green, blue);
+  SpawnBrick((float) Clamp((int)xOrigin + BRICK_SIZE), 0, red, green, blue);
+  SpawnBrick((float) Clamp((int)xOrigin), BRICK_SIZE, red, green, blue);
+  SpawnBrick((float) Clamp((int)xOrigin + BRICK_SIZE), BRICK_SIZE, red, green, blue);
+
+  position.x = xOrigin;
+  position.y = 0;
+  velocity.x = mainBrick->velocity.x;
+  velocity.y = mainBrick->velocity.y;
+  height = BRICK_SIZE * 2;
+  width = BRICK_SIZE * 2;
 }
 
 std::unordered_map<Brick*, Brick*> Shape::GetBricks()
@@ -129,12 +120,24 @@ void Shape::Update(float deltaTime)
   for(auto it = bricks.begin(); it != bricks.end(); it++)
   {
     Brick* b = it->first;
-    //if (b->IsActive())
-    //{
-    b->Update(deltaTime);
-    //}
+    if (b->IsActive())
+    {
+      b->Update(deltaTime);
+    }
   }
-  // todo don't even store here?
-  position.x = mainBrick->position.x;
-  position.y = mainBrick->position.y;
+
+  // update shape bounding box
+  // todo - remove repetition between this & brick update
+  // todo - add active check
+  float tempX = position.x + velocity.x * deltaTime;
+  float tempY = position.y + velocity.y * deltaTime;
+
+  // todo this will become inaccurate if bricks removed
+  if (tempY >= WINDOW_HEIGHT + height)
+  {
+    tempY = WINDOW_HEIGHT + height;
+  }
+
+  position.x = tempX;
+  position.y = tempY;
 }

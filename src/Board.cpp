@@ -42,7 +42,7 @@ Shape* Board::SpawnShape(Random* random)
 
 void Board::CheckCollisions()
 {
-
+  // todo need to account for velocity (might pass through a shape too quickly)
   for(auto itShapes = shapes.begin(); itShapes != shapes.end(); itShapes++)
   {
     Shape* shape = itShapes->first;
@@ -52,12 +52,13 @@ void Board::CheckCollisions()
     for(auto itBullets = bullets.begin(); itBullets != bullets.end(); itBullets++)
     {
       Bullet* bullet = itBullets->first;
-      if(bullet->IsActive()) // todo need to check this? I remove dead bullets
+      if(bullet->IsActive())
       {
-        if(CollisionShape(shape, bullet))
-        {
-          // todo - it seems that the shape bounding box if off?
+        //if(CollisionShape(shape, bullet))
+        //{
           auto bricks = shape->GetBricks();
+          // todo -> need to SORT bricks by distance to bullet and
+          // test CLOSEST brick first
           for(auto itBricks = bricks.begin(); itBricks != bricks.end(); itBricks++)
           {
             Brick* brick = itBricks->first;
@@ -72,7 +73,7 @@ void Board::CheckCollisions()
               // break;
             }
           }
-        }
+        //}
       }
       else
       {
@@ -88,7 +89,29 @@ void Board::CheckCollisions()
     // remove offscreen bullets
     RemoveDeadBullets();
 
-    // COLLISION SHAPE - GROUND
+    // COLLISION SHAPE - GROUND --> unoptimised
+    bool hasCollisionGround = false;
+    auto bricks = shape->GetBricks();
+    for(auto itBricks = bricks.begin(); itBricks != bricks.end(); itBricks++)
+    {
+      Brick* brick = itBricks->first;
+      if (brick->position.y >= WINDOW_HEIGHT - BRICK_SIZE)
+      {
+        hasCollisionGround = true;
+      }
+    }
+    if (hasCollisionGround)
+    {
+      for(auto itBricks = bricks.begin(); itBricks != bricks.end(); itBricks++)
+      {
+        Brick* b = itBricks->first;
+        shape->RemoveBrick(b);
+        b->SetStatic();
+        b->SetPosition(Clamp(b->position.y));
+        bricksToAddStatic[b] = b;
+      }
+    }
+    /* USING SHAPE
     if (shape->position.y >= WINDOW_HEIGHT - shape->height)
     {
       auto bricks = shape->GetBricks();
@@ -101,9 +124,36 @@ void Board::CheckCollisions()
         bricksToAddStatic[b] = b;
       }
       // todo skip to next shape at this point?
-    }
+    }*/
 
     // COLLISION SHAPE - STATIC BRICKS
+    for(auto itStatic = staticBricks.begin(); itStatic != staticBricks.end(); itStatic++)
+    {
+      Brick* sb = itStatic->first;
+      bool hasCollision = false;
+      auto bricks = shape->GetBricks();
+      for(auto itBricks = bricks.begin(); itBricks != bricks.end(); itBricks++)
+      {
+        Brick* brick = itBricks->first;
+        if (CollisionBrick(brick, sb))
+        {
+          hasCollision = true;
+          break;
+        }
+      }
+      if (hasCollision)
+      {
+        for(auto itBricks = bricks.begin(); itBricks != bricks.end(); itBricks++)
+        {
+          Brick* brick = itBricks->first;
+          shape->RemoveBrick(brick);
+          brick->SetPosition(Clamp(brick->position.y));
+          brick->SetStatic();
+          bricksToAddStatic[brick] = brick;
+        }
+      }
+    }
+    /* unoptimised
     for(auto itStatic = staticBricks.begin(); itStatic != staticBricks.end(); itStatic++)
     {
       Brick* sb = itStatic->first;
@@ -132,7 +182,7 @@ void Board::CheckCollisions()
           }
         }
       }
-    }
+    } */
 
     if (shape->IsEmpty())
     {
@@ -279,7 +329,6 @@ bool Board::CheckRows()
 
 std::unordered_map<Shape*, Shape*>  Board::GetShapes() const
 {
-  // TODO - alternately, could loop over shapes and make list of bricks?
   return shapes;
 }
 
