@@ -31,6 +31,7 @@ private:
   void RemoveDeadBullets();
   void UpdateStaticBricks();
   void RemoveEmptyShapes();
+  std::vector<Brick*> SortBricksByDistance(std::unordered_map<Brick*, Brick*> bricks, Bullet* bullet);
 public:
   Board();
   ~Board();

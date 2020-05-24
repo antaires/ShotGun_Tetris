@@ -3,6 +3,7 @@
 #include "../lib/glm/glm.hpp"
 
 #include <iostream>
+#include <cmath>
 
 Board::Board(){}
 
@@ -54,14 +55,12 @@ void Board::CheckCollisions()
       Bullet* bullet = itBullets->first;
       if(bullet->IsActive())
       {
-        //if(CollisionShape(shape, bullet))
-        //{
-          auto bricks = shape->GetBricks();
+          auto unorderedBricks = shape->GetBricks();
           // todo -> need to SORT bricks by distance to bullet and
           // test CLOSEST brick first
-          for(auto itBricks = bricks.begin(); itBricks != bricks.end(); itBricks++)
+          std::vector<Brick*> bricks = SortBricksByDistance(unorderedBricks, bullet);
+          for(auto brick : bricks)
           {
-            Brick* brick = itBricks->first;
             if (CollisionBullet(brick, bullet))
             {
               shape->RemoveBrick(brick);
@@ -73,7 +72,6 @@ void Board::CheckCollisions()
               // break;
             }
           }
-        //}
       }
       else
       {
@@ -111,20 +109,6 @@ void Board::CheckCollisions()
         bricksToAddStatic[b] = b;
       }
     }
-    /* USING SHAPE
-    if (shape->position.y >= WINDOW_HEIGHT - shape->height)
-    {
-      auto bricks = shape->GetBricks();
-      for (auto itBricks = bricks.begin(); itBricks != bricks.end(); itBricks++)
-      {
-        Brick* b = itBricks->first;
-        shape->RemoveBrick(b);
-        b->SetStatic();
-        b->SetPosition(Clamp(b->position.y));
-        bricksToAddStatic[b] = b;
-      }
-      // todo skip to next shape at this point?
-    }*/
 
     // COLLISION SHAPE - STATIC BRICKS
     for(auto itStatic = staticBricks.begin(); itStatic != staticBricks.end(); itStatic++)
@@ -153,36 +137,6 @@ void Board::CheckCollisions()
         }
       }
     }
-    /* unoptimised
-    for(auto itStatic = staticBricks.begin(); itStatic != staticBricks.end(); itStatic++)
-    {
-      Brick* sb = itStatic->first;
-      if (CollisionShapeBrick(shape, sb))
-      {
-        bool hasCollision = false;
-        auto bricks = shape->GetBricks();
-        for(auto itBricks = bricks.begin(); itBricks != bricks.end(); itBricks++)
-        {
-          Brick* brick = itBricks->first;
-          if (CollisionBrick(brick, sb))
-          {
-            hasCollision = true;
-            break;
-          }
-        }
-        if (hasCollision)
-        {
-          for(auto itBricks = bricks.begin(); itBricks != bricks.end(); itBricks++)
-          {
-            Brick* brick = itBricks->first;
-            shape->RemoveBrick(brick);
-            brick->SetPosition(Clamp(brick->position.y));
-            brick->SetStatic();
-            bricksToAddStatic[brick] = brick;
-          }
-        }
-      }
-    } */
 
     if (shape->IsEmpty())
     {
@@ -243,18 +197,6 @@ bool Board::CollisionBrick(Brick* b1, Brick* b2) const
       }
   return false;
 }
-
-/* TODO needed? replaced with shapes ...
-void Board::RemoveDeadBricks()
-{
-  for(auto it3 = bricksToKill.begin(); it3 != bricksToKill.end(); it3++)
-  {
-    Brick* brick = it3->first;
-      bricks.erase(brick);
-      delete brick;
-  }
-  bricksToKill.clear();
-}*/
 
 void Board::UpdateStaticBricks()
 {
@@ -325,6 +267,25 @@ bool Board::CheckRows()
   }
 
   return false;
+}
+
+std::vector<Brick*> Board::SortBricksByDistance(std::unordered_map<Brick*, Brick*> bricks, Bullet* bullet)
+{
+  std::vector<Brick*> sorted; // TODO better as a list
+  for(auto it = bricks.begin(); it != bricks.end(); ++it)
+  {
+    sorted.push_back(it->first);
+  }
+
+  // TODO actually sort
+  std::sort(sorted.begin(), sorted.end(), [bullet](const Brick* a, const Brick* b)
+  {
+    float distanceA = std::sqrt(std::pow(a->position.x - bullet->position.x,2) + std::pow(a->position.y - bullet->position.y,2));
+    float distanceB = std::sqrt(std::pow(b->position.x - bullet->position.x,2) + std::pow(b->position.y - bullet->position.y,2));
+    return distanceA < distanceB;
+  });
+
+  return sorted;
 }
 
 std::unordered_map<Shape*, Shape*>  Board::GetShapes() const
