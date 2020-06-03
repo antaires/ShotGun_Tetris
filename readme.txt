@@ -4,7 +4,7 @@ but may shoot them instead as they fall, to knock them into a needed shape
 or remove them entirely. As time goes on more and more blocks fall and the
 speed increases. 
 
-To run, use the terminal navigate the same level as the Makefile and enter:
+To run, use the terminal navigate to the same level as the Makefile and enter:
 $make
 $./game
 
